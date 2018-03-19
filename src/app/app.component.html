@@ -3,7 +3,10 @@
     Welcome to {{ title }}!
   </h1>
 </div>
-<h2>Please choose a chapter and products you like</h2>
+
+<h2 class="left-label">Please choose a chapter and products you like</h2>
+<button class="order-button" (click)="showOrder(modal)">Check order</button>
+
 <div class="container">
   <div class="column left" id="chapter-list">
     <ul class="chapter">
@@ -17,7 +20,7 @@
   </div>
   <div class="column right" id="product-list">
     <table *ngIf="selectedChapter">
-      <tr *ngFor="let product of selectedProducts">
+      <tr *ngFor="let product of selectedProducts;let i = index;">
         <td>
           <div class="column left">
             <img src="../assets/img/{{selectedChapter.id}}/{{product.id}}.jpg" alt="{{product.label}}" width="100px" height="100px">
@@ -26,13 +29,37 @@
           <div class="column right">
             {{product.label}}
             <div>
-              <span (click)="decreaseProduct(product.id, $index)" class="order-button red">&thinsp;+&thinsp;</span>
-              <input type="text" [(ngModel)]="order[selectedChapter.id][product.id]" placeholder="Count">
-              <span (click)="increaseProduct(product.id, $index)" class="order-button green">&thinsp;+&thinsp;</span>
+              <span (click)="decreaseProduct(product.id)" class="count-button red">&thinsp;-&thinsp;</span>
+              <input type="text" [(ngModel)]="order[selectedChapter.id][i].count" placeholder="Count" id="count_{{$index}}">
+              <span (click)="increaseProduct(product.id)" class="count-button green">&thinsp;+&thinsp;</span>
             </div>
           </div>
         </td>
       </tr>
     </table>
+  </div>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal" #modal>
+  <!-- Modal content -->
+  <div class="modal-content">
+    Your order:
+    <ul>
+      <li *ngFor="let chapter of chapters">
+        <div *ngIf="getKeys(order[chapter.id]).length">
+
+          Selected products for {{chapter.title}}:
+          <ul>
+            <li *ngFor="let product of getOrderedProducts(chapter.id)">
+                Ordered {{product.count}} of {{getProduct(chapter.id, product.id).label}}
+            </li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+    <button (click)="confirm(modal)">Send order</button>
+    <button (click)="close(modal)">Close (and clear/cancel?) order</button>
+
   </div>
 </div>

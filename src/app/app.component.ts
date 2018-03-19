@@ -22,7 +22,7 @@ export class AppComponent implements OnInit{
   ngOnInit(): void {
     this.chapters = this.productService.getChapters();
     for (let chapter of this.chapters) {
-      this.order[chapter.id] = {};
+      this.order[chapter.id] = this.productService.getProducts(chapter.id).map(p=> ({id: p.id, count: null}));
     }
   }
 
@@ -31,19 +31,45 @@ export class AppComponent implements OnInit{
     this.selectedProducts = this.productService.getProducts(chapter.id);
   }
 
-  public decreaseProduct(productId, index) {
-    if (this.order[this.selectedChapter.id][productId] && this.order[this.selectedChapter.id][productId] > 1) {
-      this.order[this.selectedChapter.id][productId]--;
+  public decreaseProduct(productId) {
+    const orderedProduct = this.order[this.selectedChapter.id].find(op => op.id == productId);
+    if (orderedProduct.count > 1) {
+      orderedProduct.count--;
     } else {
-      this.order[this.selectedChapter.id][productId] = null;
+      orderedProduct.count = null;
     }
   }
 
-  public increaseProduct(productId, index) {
-    if (this.order[this.selectedChapter.id][productId]) {
-      this.order[this.selectedChapter.id][productId]++;
+  public increaseProduct(productId) {
+    const orderedProduct = this.order[this.selectedChapter.id].find(op => op.id == productId);
+    if (orderedProduct.count) {
+      orderedProduct.count++;
     } else {
-      this.order[this.selectedChapter.id][productId] = 1;
+      orderedProduct.count = 1;
     }
+  }
+
+  public showOrder(modal) {
+    modal.style.display = "block";
+  }
+
+  public confirm(modal) {
+    modal.style.display = "none";
+  }
+
+  public close(modal) {
+    modal.style.display = "none";
+  }
+
+  public getKeys(object) {
+   return Object.keys(object)
+  }
+
+  public getOrderedProducts(chapterId) {
+    return this.order[chapterId].filter(orderedProduct => orderedProduct.count)
+  }
+
+  public getProduct(chapterId, productId) {
+    return this.productService.getProducts(chapterId).find(p => p.id === productId);
   }
 }
